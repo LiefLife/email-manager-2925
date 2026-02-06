@@ -14,20 +14,7 @@ import type { Email } from '../types/email.types';
 import type { SubEmail } from '../types/subEmail.types';
 
 describe('identifyForwardedEmails', () => {
-  const mockSubEmails: SubEmail[] = [
-    {
-      address: 'userABC@2925.com',
-      suffix: 'ABC',
-      createdAt: Date.now(),
-      status: 'active',
-    },
-    {
-      address: 'userXYZ@2925.com',
-      suffix: 'XYZ',
-      createdAt: Date.now(),
-      status: 'active',
-    },
-  ];
+  const mainEmail = 'user@2925.com';
 
   it('应该正确标识转发到子邮箱的邮件', () => {
     const emails: Email[] = [
@@ -43,7 +30,7 @@ describe('identifyForwardedEmails', () => {
       },
     ];
 
-    const result = identifyForwardedEmails(emails, mockSubEmails);
+    const result = identifyForwardedEmails(emails, mainEmail);
 
     expect(result[0].isSubEmailForwarded).toBe(true);
     expect(result[0].originalSubEmail).toBe('userABC@2925.com');
@@ -63,23 +50,23 @@ describe('identifyForwardedEmails', () => {
       },
     ];
 
-    const result = identifyForwardedEmails(emails, mockSubEmails);
+    const result = identifyForwardedEmails(emails, mainEmail);
 
     expect(result[0].isSubEmailForwarded).toBe(false);
     expect(result[0].originalSubEmail).toBeUndefined();
   });
 
   it('应该处理空邮件列表', () => {
-    const result = identifyForwardedEmails([], mockSubEmails);
+    const result = identifyForwardedEmails([], mainEmail);
     expect(result).toEqual([]);
   });
 
-  it('应该处理空子邮箱列表', () => {
+  it('应该处理无效的主邮箱地址', () => {
     const emails: Email[] = [
       {
         id: '1',
         from: 'sender@example.com',
-        to: 'user@2925.com',
+        to: 'userABC@2925.com',
         subject: 'Test',
         body: 'Body',
         timestamp: Date.now(),
@@ -88,7 +75,7 @@ describe('identifyForwardedEmails', () => {
       },
     ];
 
-    const result = identifyForwardedEmails(emails, []);
+    const result = identifyForwardedEmails(emails, 'invalid');
 
     expect(result[0].isSubEmailForwarded).toBe(false);
   });
@@ -107,21 +94,74 @@ describe('identifyForwardedEmails', () => {
       },
     ];
 
-    const result = identifyForwardedEmails(emails, mockSubEmails);
+    const result = identifyForwardedEmails(emails, mainEmail);
 
     expect(result[0].isSubEmailForwarded).toBe(true);
+  });
+
+  it('应该识别不同后缀的子邮箱', () => {
+    const emails: Email[] = [
+      {
+        id: '1',
+        from: 'sender@example.com',
+        to: 'userABC@2925.com',
+        subject: 'Test 1',
+        body: 'Body',
+        timestamp: Date.now(),
+        isRead: false,
+        isSubEmailForwarded: false,
+      },
+      {
+        id: '2',
+        from: 'sender@example.com',
+        to: 'userXYZ@2925.com',
+        subject: 'Test 2',
+        body: 'Body',
+        timestamp: Date.now(),
+        isRead: false,
+        isSubEmailForwarded: false,
+      },
+      {
+        id: '3',
+        from: 'sender@example.com',
+        to: 'user123@2925.com',
+        subject: 'Test 3',
+        body: 'Body',
+        timestamp: Date.now(),
+        isRead: false,
+        isSubEmailForwarded: false,
+      },
+    ];
+
+    const result = identifyForwardedEmails(emails, mainEmail);
+
+    expect(result[0].isSubEmailForwarded).toBe(true);
+    expect(result[1].isSubEmailForwarded).toBe(true);
+    expect(result[2].isSubEmailForwarded).toBe(true);
+  });
+
+  it('应该不识别其他用户的邮箱', () => {
+    const emails: Email[] = [
+      {
+        id: '1',
+        from: 'sender@example.com',
+        to: 'otherABC@2925.com',
+        subject: 'Test',
+        body: 'Body',
+        timestamp: Date.now(),
+        isRead: false,
+        isSubEmailForwarded: false,
+      },
+    ];
+
+    const result = identifyForwardedEmails(emails, mainEmail);
+
+    expect(result[0].isSubEmailForwarded).toBe(false);
   });
 });
 
 describe('isEmailForwarded', () => {
-  const mockSubEmails: SubEmail[] = [
-    {
-      address: 'userABC@2925.com',
-      suffix: 'ABC',
-      createdAt: Date.now(),
-      status: 'active',
-    },
-  ];
+  const mainEmail = 'user@2925.com';
 
   it('应该对转发邮件返回true', () => {
     const email: Email = {
@@ -135,7 +175,7 @@ describe('isEmailForwarded', () => {
       isSubEmailForwarded: false,
     };
 
-    expect(isEmailForwarded(email, mockSubEmails)).toBe(true);
+    expect(isEmailForwarded(email, mainEmail)).toBe(true);
   });
 
   it('应该对非转发邮件返回false', () => {
@@ -150,7 +190,7 @@ describe('isEmailForwarded', () => {
       isSubEmailForwarded: false,
     };
 
-    expect(isEmailForwarded(email, mockSubEmails)).toBe(false);
+    expect(isEmailForwarded(email, mainEmail)).toBe(false);
   });
 });
 
@@ -202,20 +242,7 @@ describe('getSubEmailForEmail', () => {
 });
 
 describe('groupEmailsBySubEmail', () => {
-  const mockSubEmails: SubEmail[] = [
-    {
-      address: 'userABC@2925.com',
-      suffix: 'ABC',
-      createdAt: Date.now(),
-      status: 'active',
-    },
-    {
-      address: 'userXYZ@2925.com',
-      suffix: 'XYZ',
-      createdAt: Date.now(),
-      status: 'active',
-    },
-  ];
+  const mainEmail = 'user@2925.com';
 
   it('应该按子邮箱分组邮件', () => {
     const emails: Email[] = [
@@ -251,19 +278,18 @@ describe('groupEmailsBySubEmail', () => {
       },
     ];
 
-    const result = groupEmailsBySubEmail(emails, mockSubEmails);
+    const result = groupEmailsBySubEmail(emails, mainEmail);
 
-    expect(result.get('userABC@2925.com')?.length).toBe(2);
-    expect(result.get('userXYZ@2925.com')?.length).toBe(1);
+    expect(result.get('userabc@2925.com')?.length).toBe(2);
+    expect(result.get('userxyz@2925.com')?.length).toBe(1);
   });
 
-  it('应该为没有邮件的子邮箱创建空数组', () => {
+  it('应该处理空邮件列表', () => {
     const emails: Email[] = [];
 
-    const result = groupEmailsBySubEmail(emails, mockSubEmails);
+    const result = groupEmailsBySubEmail(emails, mainEmail);
 
-    expect(result.get('userABC@2925.com')).toEqual([]);
-    expect(result.get('userXYZ@2925.com')).toEqual([]);
+    expect(result.size).toBe(0);
   });
 
   it('应该忽略非子邮箱的邮件', () => {
@@ -280,9 +306,8 @@ describe('groupEmailsBySubEmail', () => {
       },
     ];
 
-    const result = groupEmailsBySubEmail(emails, mockSubEmails);
+    const result = groupEmailsBySubEmail(emails, mainEmail);
 
-    expect(result.get('userABC@2925.com')).toEqual([]);
-    expect(result.get('userXYZ@2925.com')).toEqual([]);
+    expect(result.size).toBe(0);
   });
 });

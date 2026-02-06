@@ -114,7 +114,7 @@ export function generateSuffixWithConfig(config: SuffixGeneratorConfig): string 
  * 
  * 验证规则：
  * 1. 长度在1-20之间
- * 2. 仅包含字母、数字和允许的符号
+ * 2. 仅包含字母和数字
  */
 export function validateSuffix(suffix: string): boolean {
   // 检查是否为空或null
@@ -127,7 +127,7 @@ export function validateSuffix(suffix: string): boolean {
     return false;
   }
 
-  // 检查字符集（字母、数字、符号）
-  const validCharsRegex = /^[A-Za-z0-9_.\-]+$/;
+  // 检查字符集（仅字母和数字）
+  const validCharsRegex = /^[A-Za-z0-9]+$/;
   return validCharsRegex.test(suffix);
 }

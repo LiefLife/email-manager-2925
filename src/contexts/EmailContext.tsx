@@ -6,7 +6,6 @@
 import React, { createContext, useCallback, useState } from 'react';
 import type { Email } from '../types/email.types';
 import type { EmailsState } from '../types/app.types';
-import type { SubEmail } from '../types/subEmail.types';
 import { tauriCommands } from '../services/tauriCommands';
 import { identifyForwardedEmails } from '../utils/emailForwardIdentifier';
 
@@ -17,10 +16,10 @@ import { identifyForwardedEmails } from '../utils/emailForwardIdentifier';
 interface EmailContextValue extends EmailsState {
   /**
    * 获取邮件列表
-   * @param subEmails 子邮箱列表（用于识别转发邮件）
+   * @param mainEmail 主邮箱地址（用于识别子邮箱格式）
    * @throws 当获取邮件失败时抛出错误
    */
-  fetchEmails: (subEmails?: SubEmail[]) => Promise<void>;
+  fetchEmails: (mainEmail?: string) => Promise<void>;
   
   /**
    * 标记邮件为已读
@@ -36,9 +35,9 @@ interface EmailContextValue extends EmailsState {
   
   /**
    * 刷新邮件并识别转发
-   * @param subEmails 子邮箱列表
+   * @param mainEmail 主邮箱地址
    */
-  refreshWithSubEmails: (subEmails: SubEmail[]) => Promise<void>;
+  refreshWithMainEmail: (mainEmail: string) => Promise<void>;
 }
 
 /**
@@ -69,9 +68,9 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
 
   /**
    * 获取邮件列表
-   * @param subEmails 子邮箱列表（用于识别转发邮件）
+   * @param mainEmail 主邮箱地址（用于识别子邮箱格式）
    */
-  const fetchEmails = useCallback(async (subEmails?: SubEmail[]): Promise<void> => {
+  const fetchEmails = useCallback(async (mainEmail?: string): Promise<void> => {
     try {
       // 设置加载状态
       setEmailState(prev => ({
@@ -83,9 +82,9 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
       // 调用Tauri命令获取邮件
       let emails = await tauriCommands.email.fetchEmails();
 
-      // 如果提供了子邮箱列表，识别转发邮件
-      if (subEmails && subEmails.length > 0) {
-        emails = identifyForwardedEmails(emails, subEmails);
+      // 如果提供了主邮箱地址，识别转发邮件
+      if (mainEmail) {
+        emails = identifyForwardedEmails(emails, mainEmail);
       }
 
       // 按时间戳降序排序（最新的在前）
@@ -161,10 +160,10 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
 
   /**
    * 刷新邮件并识别转发
-   * @param subEmails 子邮箱列表
+   * @param mainEmail 主邮箱地址
    */
-  const refreshWithSubEmails = useCallback(async (subEmails: SubEmail[]): Promise<void> => {
-    await fetchEmails(subEmails);
+  const refreshWithMainEmail = useCallback(async (mainEmail: string): Promise<void> => {
+    await fetchEmails(mainEmail);
   }, [fetchEmails]);
 
   // 上下文值
@@ -173,7 +172,7 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
     fetchEmails,
     markAsRead,
     setEmails,
-    refreshWithSubEmails,
+    refreshWithMainEmail,
   };
 
   return (

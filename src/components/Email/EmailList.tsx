@@ -6,7 +6,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { EmailContext } from '../../contexts/EmailContext';
-import { SubEmailContext } from '../../contexts/SubEmailContext';
+import { AuthContext } from '../../contexts/AuthContext';
 import { useAutoRefresh } from '../../hooks/useAutoRefresh';
 import LoadingSpinner from '../Common/LoadingSpinner';
 import GlassCard from '../Common/GlassCard';
@@ -232,20 +232,20 @@ const EmailList: React.FC<EmailListProps> = ({
   onEmailSelect,
   refreshInterval = 5000,
 }) => {
-  // 获取邮件上下文
+  // 获取邮件上下文和认证上下文
   const emailContext = useContext(EmailContext);
-  const subEmailContext = useContext(SubEmailContext);
+  const authContext = useContext(AuthContext);
 
   if (!emailContext) {
     throw new Error('EmailList必须在EmailProvider内使用');
   }
 
-  if (!subEmailContext) {
-    throw new Error('EmailList必须在SubEmailProvider内使用');
+  if (!authContext) {
+    throw new Error('EmailList必须在AuthProvider内使用');
   }
 
-  const { list: emails, loading, error, refreshWithSubEmails } = emailContext;
-  const { list: subEmails } = subEmailContext;
+  const { list: emails, loading, error, refreshWithMainEmail } = emailContext;
+  const { session } = authContext;
 
   // 初始加载状态
   const [initialLoading, setInitialLoading] = useState(true);
@@ -254,7 +254,9 @@ const EmailList: React.FC<EmailListProps> = ({
    * 刷新邮件函数
    */
   const handleRefresh = async () => {
-    await refreshWithSubEmails(subEmails);
+    if (session?.email) {
+      await refreshWithMainEmail(session.email);
+    }
   };
 
   /**

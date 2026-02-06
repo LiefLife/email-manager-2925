@@ -23,7 +23,7 @@ import AnimatedButton from './components/Common/AnimatedButton';
 const AppContainer = styled.div`
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #ddd6fe 100%);
+  background: transparent;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -51,13 +51,14 @@ const TopBar = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 
-    0 2px 8px rgba(139, 92, 246, 0.1),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+  background: ${p => p.theme.glass.backgroundStrong};
+  backdrop-filter: blur(${p => p.theme.glass.blur}) saturate(${p => p.theme.glass.saturation});
+  -webkit-backdrop-filter: blur(${p => p.theme.glass.blur}) saturate(${p => p.theme.glass.saturation});
+  border-bottom: ${p => p.theme.glass.border};
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.08),
+    ${p => p.theme.glass.highlight},
+    ${p => p.theme.shadow.glow};
   flex-shrink: 0;
 `;
 
@@ -65,7 +66,7 @@ const TopBar = styled.div`
  * 应用标题样式
  */
 const AppTitle = styled.h1`
-  color: #6366f1;
+  color: ${p => p.theme.colors.text.primary};
   font-size: 18px;
   font-weight: 700;
   margin: 0;
@@ -84,7 +85,7 @@ const UserInfo = styled.div`
  * 用户邮箱显示样式
  */
 const UserEmail = styled.span`
-  color: #6b7280;
+  color: ${p => p.theme.colors.text.secondary};
   font-size: 13px;
   font-weight: 500;
 `;
@@ -112,15 +113,15 @@ const LeftPanel = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 
-    0 8px 32px 0 rgba(139, 92, 246, 0.15),
-    0 0 0 1px rgba(139, 92, 246, 0.1),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+  background: ${p => p.theme.glass.background};
+  backdrop-filter: blur(${p => p.theme.glass.blur}) saturate(${p => p.theme.glass.saturation});
+  -webkit-backdrop-filter: blur(${p => p.theme.glass.blur}) saturate(${p => p.theme.glass.saturation});
+  border-radius: ${p => p.theme.radius.xl};
+  border: ${p => p.theme.glass.border};
+  box-shadow:
+    ${p => p.theme.shadow.soft},
+    ${p => p.theme.glass.highlight},
+    ${p => p.theme.shadow.glow};
   flex-shrink: 0;
 `;
 
@@ -133,15 +134,15 @@ const MiddlePanel = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 
-    0 8px 32px 0 rgba(139, 92, 246, 0.15),
-    0 0 0 1px rgba(139, 92, 246, 0.1),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+  background: ${p => p.theme.glass.background};
+  backdrop-filter: blur(${p => p.theme.glass.blur}) saturate(${p => p.theme.glass.saturation});
+  -webkit-backdrop-filter: blur(${p => p.theme.glass.blur}) saturate(${p => p.theme.glass.saturation});
+  border-radius: ${p => p.theme.radius.xl};
+  border: ${p => p.theme.glass.border};
+  box-shadow:
+    ${p => p.theme.shadow.soft},
+    ${p => p.theme.glass.highlight},
+    ${p => p.theme.shadow.glow};
 `;
 
 /**
@@ -154,15 +155,15 @@ const RightPanel = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 
-    0 8px 32px 0 rgba(139, 92, 246, 0.15),
-    0 0 0 1px rgba(139, 92, 246, 0.1),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+  background: ${p => p.theme.glass.background};
+  backdrop-filter: blur(${p => p.theme.glass.blur}) saturate(${p => p.theme.glass.saturation});
+  -webkit-backdrop-filter: blur(${p => p.theme.glass.blur}) saturate(${p => p.theme.glass.saturation});
+  border-radius: ${p => p.theme.radius.xl};
+  border: ${p => p.theme.glass.border};
+  box-shadow:
+    ${p => p.theme.shadow.soft},
+    ${p => p.theme.glass.highlight},
+    ${p => p.theme.shadow.glow};
   flex-shrink: 0;
 `;
 

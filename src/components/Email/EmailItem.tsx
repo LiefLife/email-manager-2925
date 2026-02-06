@@ -14,22 +14,23 @@ import type { Email } from '../../types/email.types';
 const EmailItemContainer = styled(motion.div)<{ $isRead: boolean; $isSelected: boolean }>`
   background: ${props => 
     props.$isSelected 
-      ? 'rgba(99, 102, 241, 0.2)' 
+      ? 'rgba(79, 70, 229, 0.14)' 
       : props.$isRead 
-        ? 'rgba(255, 255, 255, 0.5)' 
-        : 'rgba(255, 255, 255, 0.7)'
+        ? props.theme.glass.background 
+        : props.theme.glass.backgroundStrong
   };
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(${props => props.theme.glass.blur}) saturate(${props => props.theme.glass.saturation});
+  -webkit-backdrop-filter: blur(${props => props.theme.glass.blur}) saturate(${props => props.theme.glass.saturation});
   border-radius: 12px;
   border: 1px solid ${props => 
     props.$isSelected 
-      ? 'rgba(99, 102, 241, 0.4)' 
-      : 'rgba(255, 255, 255, 0.3)'
+      ? 'rgba(79, 70, 229, 0.24)' 
+      : 'rgba(255, 255, 255, 0.24)'
   };
   box-shadow: 
-    0 4px 16px 0 rgba(139, 92, 246, 0.1),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+    0 10px 30px rgba(15, 23, 42, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 0 1px rgba(139, 92, 246, 0.08);
   padding: 12px;
   padding-left: 16px;
   cursor: pointer;
@@ -43,12 +44,13 @@ const EmailItemContainer = styled(motion.div)<{ $isRead: boolean; $isSelected: b
   &:hover {
     background: ${props => 
       props.$isSelected 
-        ? 'rgba(99, 102, 241, 0.25)' 
-        : 'rgba(255, 255, 255, 0.8)'
+        ? 'rgba(79, 70, 229, 0.18)' 
+        : 'rgba(255, 255, 255, 0.70)'
     };
     box-shadow: 
-      0 6px 20px 0 rgba(139, 92, 246, 0.15),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+      0 14px 44px rgba(15, 23, 42, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.42),
+      0 0 0 1px rgba(34, 211, 238, 0.10);
     transform: translateX(2px);
   }
 
@@ -63,7 +65,7 @@ const EmailItemContainer = styled(motion.div)<{ $isRead: boolean; $isSelected: b
     background: ${props => 
       props.$isRead 
         ? 'transparent' 
-        : 'linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%)'
+        : `linear-gradient(180deg, ${props.theme.colors.brand.indigo} 0%, ${props.theme.colors.brand.violet} 55%, ${props.theme.colors.brand.cyan} 120%)`
     };
     border-radius: 12px 0 0 12px;
   }
@@ -84,7 +86,7 @@ const EmailHeader = styled.div`
  * 发件人样式
  */
 const EmailFrom = styled.div<{ $isRead: boolean }>`
-  color: ${props => props.$isRead ? '#6b7280' : '#1f2937'};
+  color: ${props => props.$isRead ? props.theme.colors.text.secondary : props.theme.colors.text.primary};
   font-size: 13px;
   font-weight: ${props => props.$isRead ? '400' : '600'};
   flex: 1;
@@ -99,7 +101,7 @@ const EmailFrom = styled.div<{ $isRead: boolean }>`
  * 时间戳样式
  */
 const EmailTimestamp = styled.div`
-  color: #9ca3af;
+  color: ${p => p.theme.colors.text.muted};
   font-size: 11px;
   white-space: nowrap;
   flex-shrink: 0;
@@ -109,7 +111,7 @@ const EmailTimestamp = styled.div`
  * 邮件主题样式
  */
 const EmailSubject = styled.div<{ $isRead: boolean }>`
-  color: ${props => props.$isRead ? '#6b7280' : '#374151'};
+  color: ${props => props.$isRead ? props.theme.colors.text.secondary : props.theme.colors.text.primary};
   font-size: 14px;
   font-weight: ${props => props.$isRead ? '400' : '600'};
   margin-bottom: 4px;
@@ -122,7 +124,7 @@ const EmailSubject = styled.div<{ $isRead: boolean }>`
  * 邮件预览样式
  */
 const EmailPreview = styled.div`
-  color: #9ca3af;
+  color: ${p => p.theme.colors.text.muted};
   font-size: 12px;
   line-height: 1.4;
   overflow: hidden;
@@ -141,10 +143,10 @@ const ForwardedBadge = styled.div`
   align-items: center;
   gap: 4px;
   padding: 3px 8px;
-  background: rgba(99, 102, 241, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  background: rgba(79, 70, 229, 0.10);
+  border: 1px solid rgba(79, 70, 229, 0.22);
   border-radius: 6px;
-  color: #6366f1;
+  color: ${p => p.theme.colors.text.primary};
   font-size: 10px;
   font-weight: 500;
   margin-top: 2px;

@@ -21,19 +21,30 @@ const StyledGlassCard = styled(motion.div)<{
   $padding?: string;
   $borderRadius?: string;
 }>`
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: ${props => props.$borderRadius || '20px'};
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 45%, rgba(255, 255, 255, 0.12) 100%),
+    ${props => props.theme.glass.background};
+  backdrop-filter: blur(${props => props.theme.glass.blur}) saturate(${props => props.theme.glass.saturation});
+  -webkit-backdrop-filter: blur(${props => props.theme.glass.blur}) saturate(${props => props.theme.glass.saturation});
+  border-radius: ${props => props.$borderRadius || props.theme.radius.xl};
+  border: ${props => props.theme.glass.border};
+  box-shadow:
+    ${props => props.theme.shadow.soft},
+    ${props => props.theme.glass.highlight},
+    ${props => props.theme.shadow.glow};
   padding: ${props => props.$padding || '20px'};
   transition: all 0.3s ease;
   cursor: ${props => props.onClick ? 'pointer' : 'default'};
 
   &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.45);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.10) 45%, rgba(255, 255, 255, 0.16) 100%),
+      ${props => props.theme.glass.backgroundHover};
+    border: ${props => props.theme.glass.borderStrong};
+    box-shadow:
+      ${props => props.theme.shadow.lift},
+      ${props => props.theme.glass.highlight},
+      ${props => props.theme.shadow.glow};
     transform: translateY(-2px);
   }
 `;

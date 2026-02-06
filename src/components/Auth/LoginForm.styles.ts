@@ -17,7 +17,7 @@ export const LoginContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #ddd6fe 100%);
+  background: transparent;
   padding: 20px;
   box-sizing: border-box;
   overflow: hidden;
@@ -37,11 +37,14 @@ export const LoginCard = styled(GlassCard)`
   display: flex;
   flex-direction: column;
   gap: 24px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(139, 92, 246, 0.2);
+  background: ${p => p.theme.glass.backgroundStrong};
+  backdrop-filter: blur(${p => p.theme.glass.blur}) saturate(${p => p.theme.glass.saturation});
+  -webkit-backdrop-filter: blur(${p => p.theme.glass.blur}) saturate(${p => p.theme.glass.saturation});
+  border: ${p => p.theme.glass.border};
+  box-shadow:
+    ${p => p.theme.shadow.soft},
+    ${p => p.theme.glass.highlight},
+    ${p => p.theme.shadow.glow};
 
   /* 响应式布局 - 小屏幕 */
   @media (max-width: 768px) {
@@ -61,7 +64,7 @@ export const LoginCard = styled(GlassCard)`
  * 带动画效果的标题文本
  */
 export const LoginTitle = styled(motion.h1)`
-  color: #6366f1;
+  color: ${p => p.theme.colors.text.primary};
   font-size: 28px;
   font-weight: 600;
   text-align: center;
@@ -101,7 +104,7 @@ export const InputGroup = styled.div`
  * 输入框标签
  */
 export const InputLabel = styled.label`
-  color: #4b5563;
+  color: ${p => p.theme.colors.text.secondary};
   font-size: 14px;
   font-weight: 500;
   margin-left: 4px;
@@ -120,20 +123,20 @@ export const Input = styled.input<{ $hasError: boolean }>`
   width: 100%;
   padding: 14px 16px;
   font-size: 16px;
-  color: #1f2937;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  color: ${p => p.theme.colors.text.primary};
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(${p => p.theme.glass.blur}) saturate(${p => p.theme.glass.saturation});
+  -webkit-backdrop-filter: blur(${p => p.theme.glass.blur}) saturate(${p => p.theme.glass.saturation});
   border-radius: 12px;
   border: 1px solid ${props => 
     props.$hasError 
       ? 'rgba(239, 68, 68, 0.5)' 
-      : 'rgba(139, 92, 246, 0.3)'
+      : 'rgba(255, 255, 255, 0.26)'
   };
   box-shadow: ${props =>
     props.$hasError
       ? '0 0 0 2px rgba(239, 68, 68, 0.2)'
-      : '0 2px 8px 0 rgba(139, 92, 246, 0.1)'
+      : '0 10px 30px rgba(15, 23, 42, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.35)'
   };
   outline: none;
   transition: all 0.3s ease;
@@ -146,16 +149,16 @@ export const Input = styled.input<{ $hasError: boolean }>`
 
   /* 焦点状态 */
   &:focus {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.78);
     border-color: ${props =>
       props.$hasError
         ? 'rgba(239, 68, 68, 0.6)'
-        : 'rgba(99, 102, 241, 0.6)'
+        : 'rgba(34, 211, 238, 0.55)'
     };
     box-shadow: ${props =>
       props.$hasError
         ? '0 0 0 3px rgba(239, 68, 68, 0.3)'
-        : '0 0 0 3px rgba(99, 102, 241, 0.2)'
+        : '0 0 0 3px rgba(34, 211, 238, 0.22)'
     };
     transform: translateY(-1px);
   }

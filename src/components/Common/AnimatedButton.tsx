@@ -29,17 +29,17 @@ const StyledButton = styled(motion.button)<{
     if (props.disabled) return 'rgba(200, 200, 200, 0.3)';
     switch (props.$variant) {
       case 'primary':
-        return 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)';
+        return `linear-gradient(135deg, ${props.theme.colors.brand.indigo} 0%, ${props.theme.colors.brand.violet} 55%, ${props.theme.colors.brand.cyan} 120%)`;
       case 'secondary':
-        return 'rgba(139, 92, 246, 0.1)';
+        return props.theme.glass.backgroundStrong;
       case 'danger':
         return 'rgba(239, 68, 68, 0.9)';
       default:
-        return 'rgba(139, 92, 246, 0.1)';
+        return props.theme.glass.backgroundStrong;
     }
   }};
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(${props => props.theme.glass.blur}) saturate(${props => props.theme.glass.saturation});
+  -webkit-backdrop-filter: blur(${props => props.theme.glass.blur}) saturate(${props => props.theme.glass.saturation});
   border-radius: ${props => {
     switch (props.$size) {
       case 'small':
@@ -54,16 +54,19 @@ const StyledButton = styled(motion.button)<{
     if (props.disabled) return 'rgba(200, 200, 200, 0.3)';
     switch (props.$variant) {
       case 'primary':
-        return 'rgba(99, 102, 241, 0.5)';
+        return 'rgba(255, 255, 255, 0.26)';
       case 'secondary':
-        return 'rgba(139, 92, 246, 0.3)';
+        return 'rgba(255, 255, 255, 0.24)';
       case 'danger':
         return 'rgba(239, 68, 68, 0.5)';
       default:
-        return 'rgba(139, 92, 246, 0.3)';
+        return 'rgba(255, 255, 255, 0.24)';
     }
   }};
-  box-shadow: 0 4px 16px 0 rgba(139, 92, 246, 0.25);
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    0 0 0 1px rgba(139, 92, 246, 0.14);
   
   /* 尺寸样式 */
   padding: ${props => {
@@ -90,7 +93,7 @@ const StyledButton = styled(motion.button)<{
   /* 文本样式 */
   color: ${props => {
     if (props.disabled) return 'rgba(150, 150, 150, 0.6)';
-    if (props.$variant === 'secondary') return '#6366f1';
+    if (props.$variant === 'secondary') return props.theme.colors.text.primary;
     return '#ffffff';
   }};
   font-weight: 500;
@@ -99,7 +102,6 @@ const StyledButton = styled(motion.button)<{
   /* 交互样式 */
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   outline: none;
-  border: none;
   transition: all 0.3s ease;
   
   /* 悬停效果 */
@@ -107,16 +109,20 @@ const StyledButton = styled(motion.button)<{
     background: ${props => {
       switch (props.$variant) {
         case 'primary':
-          return 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)';
+          return `linear-gradient(135deg, ${props.theme.colors.brand.indigo} 0%, ${props.theme.colors.brand.violet} 40%, ${props.theme.colors.brand.pink} 115%)`;
         case 'secondary':
-          return 'rgba(139, 92, 246, 0.2)';
+          return props.theme.glass.backgroundHover;
         case 'danger':
           return 'rgba(220, 38, 38, 0.9)';
         default:
-          return 'rgba(139, 92, 246, 0.2)';
+          return props.theme.glass.backgroundHover;
       }
     }};
-    box-shadow: 0 6px 20px 0 rgba(139, 92, 246, 0.35);
+    box-shadow:
+      0 14px 44px rgba(15, 23, 42, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.42),
+      0 0 0 1px rgba(34, 211, 238, 0.16);
+    transform: translateY(-1px);
   }
   
   /* 激活效果 */
