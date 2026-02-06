@@ -292,7 +292,7 @@ const generatePreview = (body: string, maxLength: number = 100): string => {
  *   onClick={handleEmailClick}
  * />
  */
-const EmailItem: React.FC<EmailItemProps> = ({
+const EmailItem: React.FC<EmailItemProps> = React.memo(({
   email,
   isSelected = false,
   onClick,
@@ -301,9 +301,9 @@ const EmailItem: React.FC<EmailItemProps> = ({
   /**
    * 处理点击事件
    */
-  const handleClick = () => {
+  const handleClick = React.useCallback(() => {
     onClick?.(email);
-  };
+  }, [onClick, email]);
 
   return (
     <EmailItemContainer
@@ -345,6 +345,8 @@ const EmailItem: React.FC<EmailItemProps> = ({
       )}
     </EmailItemContainer>
   );
-};
+});
+
+EmailItem.displayName = 'EmailItem';
 
 export default EmailItem;

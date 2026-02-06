@@ -166,14 +166,14 @@ export const EmailProvider: React.FC<EmailProviderProps> = ({ children }) => {
     await fetchEmails(mainEmail);
   }, [fetchEmails]);
 
-  // 上下文值
-  const contextValue: EmailContextValue = {
+  // 上下文值 - 使用useMemo避免不必要的重渲染
+  const contextValue: EmailContextValue = React.useMemo(() => ({
     ...emailState,
     fetchEmails,
     markAsRead,
     setEmails,
     refreshWithMainEmail,
-  };
+  }), [emailState, fetchEmails, markAsRead, setEmails, refreshWithMainEmail]);
 
   return (
     <EmailContext.Provider value={contextValue}>

@@ -30,9 +30,10 @@ const GlobalStyle = createGlobalStyle`
       ${(p) => p.theme.background.glowB},
       ${(p) => p.theme.background.glowC};
     filter: blur(0px);
-    opacity: 1;
+    opacity: 0.8;
     pointer-events: none;
     z-index: -1;
+    will-change: transform;
   }
 
   body::after {
@@ -40,9 +41,9 @@ const GlobalStyle = createGlobalStyle`
     position: fixed;
     inset: 0;
     background:
-      radial-gradient(1200px 800px at 30% 20%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 55%),
-      radial-gradient(900px 650px at 80% 15%, rgba(34, 211, 238, 0.08) 0%, rgba(34, 211, 238, 0) 60%),
-      radial-gradient(800px 700px at 70% 85%, rgba(139, 92, 246, 0.10) 0%, rgba(139, 92, 246, 0) 65%);
+      radial-gradient(1200px 800px at 30% 20%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 55%),
+      radial-gradient(900px 650px at 80% 15%, rgba(34, 211, 238, 0.06) 0%, rgba(34, 211, 238, 0) 60%),
+      radial-gradient(800px 700px at 70% 85%, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0) 65%);
     mix-blend-mode: screen;
     pointer-events: none;
     z-index: -1;

@@ -38,3 +38,15 @@ base64 = "0.22"
 keyring = "2.3"
 machine-uid = "0.5"
 
+[profile.release]
+# 启用链接时优化
+lto = true
+# 优化代码大小和性能
+opt-level = "z"
+# 减少并行代码生成单元以提高优化效果
+codegen-units = 1
+# 启用strip以减小二进制大小
+strip = true
+# 启用panic立即中止以减小大小
+panic = "abort"
+

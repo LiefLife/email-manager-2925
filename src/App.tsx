@@ -179,18 +179,11 @@ const LoadingContainer = styled.div`
 `;
 
 /**
- * MainApp内部组件
- * 处理认证状态和路由逻辑
+ * 时钟组件 - 独立渲染避免影响父组件
  */
-const MainApp: React.FC = () => {
-  const { isAuthenticated, loading, session, logout } = useAuth();
-  const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+const Clock: React.FC = React.memo(() => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  /**
-   * 更新实时时间
-   */
   React.useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -199,9 +192,6 @@ const MainApp: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  /**
-   * 格式化时间显示
-   */
   const formatTime = (date: Date): string => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -213,24 +203,38 @@ const MainApp: React.FC = () => {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   };
 
+  return <AppTitle>{formatTime(currentTime)}</AppTitle>;
+});
+
+Clock.displayName = 'Clock';
+
+/**
+ * MainApp内部组件
+ * 处理认证状态和路由逻辑
+ */
+const MainApp: React.FC = () => {
+  const { isAuthenticated, loading, session, logout } = useAuth();
+  const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
   /**
-   * 处理登出
+   * 处理登出 - 使用useCallback避免重复创建
    */
-  const handleLogout = async () => {
+  const handleLogout = React.useCallback(async () => {
     try {
       await logout();
     } catch (error) {
       console.error('登出失败:', error);
     }
-  };
+  }, [logout]);
 
   /**
-   * 处理邮件选择
+   * 处理邮件选择 - 使用useCallback避免重复创建
    * @param emailId 邮件ID
    */
-  const handleEmailSelect = (emailId: string) => {
+  const handleEmailSelect = React.useCallback((emailId: string) => {
     setSelectedEmailId(emailId);
-  };
+  }, []);
 
   /**
    * 从EmailContext获取选中的邮件对象
@@ -272,7 +276,7 @@ const MainApp: React.FC = () => {
       <MainContainer>
         {/* 顶部导航栏 */}
         <TopBar>
-          <AppTitle>{formatTime(currentTime)}</AppTitle>
+          <Clock />
           <UserInfo>
             <UserEmail>{session?.email}</UserEmail>
             <AnimatedButton
@@ -297,7 +301,7 @@ const MainApp: React.FC = () => {
             <EmailList
               selectedEmailId={selectedEmailId || undefined}
               onEmailSelect={handleEmailSelect}
-              refreshInterval={5000}
+              refreshInterval={10000}
             />
           </MiddlePanel>
 
