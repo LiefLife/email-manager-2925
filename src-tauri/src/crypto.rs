@@ -264,6 +264,7 @@ pub fn layer3_load(email: &str) -> Result<Vec<u8>, CryptoError> {
 /// 
 /// # 参数
 /// * `email` - 用户邮箱
+#[allow(dead_code)]
 pub fn layer3_delete(email: &str) -> Result<(), CryptoError> {
     let entry = Entry::new("email-manager-2925", email)
         .map_err(|e| CryptoError::KeyringError(format!("创建keyring条目失败: {}", e)))?;
@@ -318,6 +319,7 @@ pub fn load_and_decrypt_password(email: &str) -> Result<String, CryptoError> {
 /// 
 /// # 参数
 /// * `email` - 用户邮箱
+#[allow(dead_code)]
 pub fn delete_saved_password(email: &str) -> Result<(), CryptoError> {
     layer3_delete(email)
 }

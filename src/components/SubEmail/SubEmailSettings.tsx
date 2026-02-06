@@ -16,8 +16,9 @@ const Overlay = styled(motion.div)`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,11 +29,15 @@ const Overlay = styled(motion.div)`
  * 弹窗容器样式
  */
 const Modal = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 20px;
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px 0 rgba(139, 92, 246, 0.2),
+    0 0 0 1px rgba(139, 92, 246, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
   padding: 24px;
   width: 90%;
   max-width: 480px;
@@ -166,6 +171,8 @@ const PreviewSection = styled.div`
   margin-top: 20px;
   padding: 16px;
   background: rgba(139, 92, 246, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 12px;
   border: 1px solid rgba(139, 92, 246, 0.2);
 `;
@@ -223,12 +230,14 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
       box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
     }
   ` : `
-    background: rgba(139, 92, 246, 0.1);
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: #6366f1;
     border: 1px solid rgba(139, 92, 246, 0.3);
     
     &:hover {
-      background: rgba(139, 92, 246, 0.15);
+      background: rgba(255, 255, 255, 0.7);
     }
   `}
   
@@ -265,16 +274,31 @@ const generatePreview = (baseEmail: string, settings: SubEmailSettingsConfig): s
   const [username, domain] = baseEmail.split('@');
   
   let suffix = '';
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  const numbers = '0123456789';
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
   const symbols = '_-.';
   
   const length = settings.useRandomLength 
     ? Math.floor(Math.random() * 17) + 4 
     : settings.fixedLength;
   
-  let availableChars = chars;
+  // 根据设置构建可用字符集
+  let availableChars = '';
+  
+  if (settings.includeLetters) {
+    availableChars += letters;
+  }
+  
+  // 始终包含数字
+  availableChars += numbers;
+  
   if (settings.includeSymbols) {
     availableChars += symbols;
+  }
+  
+  // 如果没有可用字符，至少使用数字
+  if (availableChars.length === 0) {
+    availableChars = numbers;
   }
   
   for (let i = 0; i < length; i++) {

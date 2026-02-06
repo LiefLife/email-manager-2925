@@ -59,6 +59,12 @@ interface SubEmailContextValue extends SubEmailState {
   updateSubEmail: (address: string, updates: Partial<SubEmail>) => Promise<void>;
   
   /**
+   * 删除子邮箱
+   * @param address 子邮箱地址
+   */
+  deleteSubEmail: (address: string) => Promise<void>;
+  
+  /**
    * 刷新子邮箱列表（从本地存储重新加载）
    */
   refreshSubEmails: () => Promise<void>;
@@ -211,6 +217,40 @@ export const SubEmailProvider: React.FC<SubEmailProviderProps> = ({ children }) 
   }, [subEmailState.list, saveToStorage]);
 
   /**
+   * 删除子邮箱
+   * @param address 子邮箱地址
+   */
+  const deleteSubEmail = useCallback(async (address: string): Promise<void> => {
+    try {
+      // 查找要删除的子邮箱
+      const index = subEmailState.list.findIndex(se => se.address === address);
+      if (index === -1) {
+        throw new Error('子邮箱不存在');
+      }
+
+      // 从列表中移除
+      const updatedList = subEmailState.list.filter(se => se.address !== address);
+      
+      // 保存到本地存储
+      await saveToStorage(updatedList);
+      
+      // 更新状态
+      setSubEmailState(prev => ({
+        ...prev,
+        list: updatedList,
+        error: null,
+      }));
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '删除子邮箱失败';
+      setSubEmailState(prev => ({
+        ...prev,
+        error: errorMessage,
+      }));
+      throw error;
+    }
+  }, [subEmailState.list, saveToStorage]);
+
+  /**
    * 刷新子邮箱列表（从本地存储重新加载）
    */
   const refreshSubEmails = useCallback(async (): Promise<void> => {
@@ -270,6 +310,7 @@ export const SubEmailProvider: React.FC<SubEmailProviderProps> = ({ children }) 
     getSubEmailDetails,
     addSubEmail,
     updateSubEmail,
+    deleteSubEmail,
     refreshSubEmails,
   };
 

@@ -6,7 +6,7 @@
 import { useState, useCallback, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import type { SubEmail } from '../types/subEmail.types';
-import { generateRandomLengthSuffix } from '../utils/suffixGenerator';
+import { generateSuffixWithConfig, type SuffixGeneratorConfig } from '../utils/suffixGenerator';
 import { tauriCommands } from '../services/tauriCommands';
 
 /**
@@ -30,9 +30,10 @@ interface UseSubEmailGeneratorReturn {
   
   /**
    * 生成新的子邮箱
+   * @param config - 生成配置
    * @returns 生成的子邮箱信息
    */
-  generateSubEmail: () => Promise<SubEmail>;
+  generateSubEmail: (config?: SuffixGeneratorConfig) => Promise<SubEmail>;
   
   /**
    * 清除错误信息
@@ -96,16 +97,17 @@ export function useSubEmailGenerator(): UseSubEmailGeneratorReturn {
    * 
    * 流程：
    * 1. 验证用户已登录
-   * 2. 生成随机后缀（1-20位）
+   * 2. 根据配置生成随机后缀
    * 3. 构造子邮箱地址（用户名+后缀@域名）
    * 4. 创建SubEmail对象，状态为'creating'
    * 5. 发送创建邮件到子邮箱地址
    * 6. 更新状态为'active'
    * 
+   * @param config - 生成配置
    * @returns 生成的子邮箱信息
    * @throws 当用户未登录或生成失败时抛出错误
    */
-  const generateSubEmail = useCallback(async (): Promise<SubEmail> => {
+  const generateSubEmail = useCallback(async (config?: SuffixGeneratorConfig): Promise<SubEmail> => {
     try {
       // 验证用户已登录
       if (!session || !session.email) {
@@ -116,8 +118,12 @@ export function useSubEmailGenerator(): UseSubEmailGeneratorReturn {
       setIsGenerating(true);
       setError(null);
 
-      // 1. 生成随机后缀（1-20位）
-      const suffix = generateRandomLengthSuffix();
+      // 1. 根据配置生成随机后缀
+      const suffix = generateSuffixWithConfig(config || {
+        useRandomLength: true,
+        includeLetters: true,
+        includeSymbols: false
+      });
 
       // 2. 构造子邮箱地址（用户名+后缀@域名）
       const subEmailAddress = constructSubEmailAddress(session.email, suffix);

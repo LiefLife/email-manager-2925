@@ -14,20 +14,22 @@ import type { Email } from '../../types/email.types';
 const EmailItemContainer = styled(motion.div)<{ $isRead: boolean; $isSelected: boolean }>`
   background: ${props => 
     props.$isSelected 
-      ? 'rgba(99, 102, 241, 0.15)' 
+      ? 'rgba(99, 102, 241, 0.2)' 
       : props.$isRead 
-        ? 'rgba(255, 255, 255, 0.7)' 
-        : 'rgba(255, 255, 255, 0.85)'
+        ? 'rgba(255, 255, 255, 0.5)' 
+        : 'rgba(255, 255, 255, 0.7)'
   };
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 12px;
   border: 1px solid ${props => 
     props.$isSelected 
       ? 'rgba(99, 102, 241, 0.4)' 
-      : 'rgba(139, 92, 246, 0.2)'
+      : 'rgba(255, 255, 255, 0.3)'
   };
-  box-shadow: 0 2px 8px 0 rgba(139, 92, 246, 0.1);
+  box-shadow: 
+    0 4px 16px 0 rgba(139, 92, 246, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
   padding: 12px;
   padding-left: 16px;
   cursor: pointer;
@@ -41,10 +43,12 @@ const EmailItemContainer = styled(motion.div)<{ $isRead: boolean; $isSelected: b
   &:hover {
     background: ${props => 
       props.$isSelected 
-        ? 'rgba(99, 102, 241, 0.2)' 
-        : 'rgba(255, 255, 255, 0.95)'
+        ? 'rgba(99, 102, 241, 0.25)' 
+        : 'rgba(255, 255, 255, 0.8)'
     };
-    box-shadow: 0 4px 12px 0 rgba(139, 92, 246, 0.2);
+    box-shadow: 
+      0 6px 20px 0 rgba(139, 92, 246, 0.15),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
     transform: translateX(2px);
   }
 

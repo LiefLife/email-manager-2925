@@ -10,6 +10,7 @@ import AnimatedButton from '../Common/AnimatedButton';
 import LoadingSpinner from '../Common/LoadingSpinner';
 import { useSubEmailGenerator } from '../../hooks/useSubEmailGenerator';
 import { useSubEmail } from '../../hooks/useSubEmail';
+import type { SubEmailSettingsConfig } from './SubEmailSettings';
 
 /**
  * 按钮容器样式
@@ -116,6 +117,7 @@ interface CreateSubEmailButtonProps {
   onSuccess?: (address: string) => void;
   onError?: (error: string) => void;
   className?: string;
+  settings?: SubEmailSettingsConfig;
 }
 
 /**
@@ -130,11 +132,13 @@ interface CreateSubEmailButtonProps {
  * @param onSuccess - 生成成功回调函数
  * @param onError - 生成失败回调函数
  * @param className - 自定义CSS类名
+ * @param settings - 子邮箱生成设置
  */
 const CreateSubEmailButton: React.FC<CreateSubEmailButtonProps> = ({
   onSuccess,
   onError,
-  className
+  className,
+  settings
 }) => {
   const { generateSubEmail, isGenerating, error, clearError } = useSubEmailGenerator();
   const { addSubEmail } = useSubEmail();
@@ -153,7 +157,7 @@ const CreateSubEmailButton: React.FC<CreateSubEmailButtonProps> = ({
       setGeneratedAddress(null);
 
       // 生成子邮箱
-      const subEmail = await generateSubEmail();
+      const subEmail = await generateSubEmail(settings);
       
       // 添加到子邮箱列表
       await addSubEmail(subEmail);

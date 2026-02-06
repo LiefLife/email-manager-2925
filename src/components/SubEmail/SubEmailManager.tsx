@@ -46,8 +46,10 @@ const SettingsButton = styled.button`
   right: 0;
   width: 32px;
   height: 32px;
-  border: none;
-  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 8px;
   cursor: pointer;
   display: flex;
@@ -56,7 +58,7 @@ const SettingsButton = styled.button`
   transition: all 0.2s ease;
   
   &:hover {
-    background: rgba(139, 92, 246, 0.2);
+    background: rgba(255, 255, 255, 0.7);
     transform: rotate(90deg);
   }
   
@@ -120,12 +122,14 @@ const ListSection = styled.div`
  */
 const DetailPanel = styled(motion.div)`
   padding: 12px;
-  background: rgba(139, 92, 246, 0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 12px;
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  box-shadow: 0 2px 8px 0 rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 4px 16px 0 rgba(139, 92, 246, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
   flex-shrink: 0;
 `;
 
@@ -224,6 +228,10 @@ const detailVariants = {
  */
 interface SubEmailManagerProps {
   className?: string;
+  isSettingsMode?: boolean;
+  isSettingsOpen?: boolean;
+  onCloseSettings?: () => void;
+  onOpenSettings?: () => void;
 }
 
 /**
@@ -239,12 +247,19 @@ interface SubEmailManagerProps {
  * 需求: 4.1, 4.2
  * 
  * @param className - 自定义CSS类名
+ * @param isSettingsMode - 是否为设置模式（仅显示设置弹窗）
+ * @param isSettingsOpen - 设置弹窗是否打开
+ * @param onCloseSettings - 关闭设置弹窗回调
+ * @param onOpenSettings - 打开设置弹窗回调
  */
 const SubEmailManager: React.FC<SubEmailManagerProps> = ({
-  className
+  className,
+  isSettingsMode = false,
+  isSettingsOpen = false,
+  onCloseSettings,
+  onOpenSettings
 }) => {
   const [selectedSubEmail, setSelectedSubEmail] = useState<SubEmail | null>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [settings, setSettings] = useState<SubEmailSettingsConfig>({
     useRandomLength: true,
     fixedLength: 20,
@@ -290,6 +305,19 @@ const SubEmailManager: React.FC<SubEmailManagerProps> = ({
     // TODO: 保存设置到本地存储
   };
 
+  // 如果是设置模式，只渲染设置弹窗
+  if (isSettingsMode) {
+    return (
+      <SubEmailSettings
+        isOpen={isSettingsOpen}
+        onClose={onCloseSettings || (() => {})}
+        settings={settings}
+        onSave={handleSettingsSave}
+        baseEmail="avemusica@2925.com"
+      />
+    );
+  }
+
   return (
     <ManagerContainer
       className={className}
@@ -299,7 +327,7 @@ const SubEmailManager: React.FC<SubEmailManagerProps> = ({
     >
       <motion.div variants={itemVariants}>
         <TitleSection>
-          <SettingsButton onClick={() => setIsSettingsOpen(true)}>
+          <SettingsButton onClick={onOpenSettings}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
               <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
@@ -315,6 +343,7 @@ const SubEmailManager: React.FC<SubEmailManagerProps> = ({
           <CreateSubEmailButton
             onSuccess={handleGenerateSuccess}
             onError={handleGenerateError}
+            settings={settings}
           />
         </ActionSection>
       </motion.div>
@@ -341,14 +370,6 @@ const SubEmailManager: React.FC<SubEmailManagerProps> = ({
           </DetailContent>
         </DetailPanel>
       )}
-
-      <SubEmailSettings
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        settings={settings}
-        onSave={handleSettingsSave}
-        baseEmail="avemusica@2925.com"
-      />
     </ManagerContainer>
   );
 };

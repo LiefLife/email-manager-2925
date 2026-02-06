@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "2925邮箱管理系统",
+  "productName": "2925EmailManager",
   "version": "0.1.0",
   "identifier": "com.lieflife.email-manager-2925",
   "build": {

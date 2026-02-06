@@ -3,11 +3,12 @@
  * 显示子邮箱列表
  */
 
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import LoadingSpinner from '../Common/LoadingSpinner';
 import { useSubEmail } from '../../hooks/useSubEmail';
+import { SubEmailContext } from '../../contexts/SubEmailContext';
 import type { SubEmail } from '../../types/subEmail.types';
 
 /**
@@ -71,11 +72,14 @@ const ListTitle = styled.h3`
  */
 const SubEmailItem = styled(motion.div)`
   padding: 12px;
-  background: rgba(139, 92, 246, 0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 12px;
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 4px 16px 0 rgba(139, 92, 246, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
   transition: all 0.3s ease;
   flex-shrink: 0;
   display: flex;
@@ -84,8 +88,11 @@ const SubEmailItem = styled(motion.div)`
   gap: 8px;
   
   &:hover {
-    background: rgba(139, 92, 246, 0.12);
-    border-color: rgba(139, 92, 246, 0.3);
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 
+      0 6px 20px 0 rgba(139, 92, 246, 0.15),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
   }
 `;
 
@@ -159,6 +166,167 @@ const CopyButton = styled.button<{ $copied: boolean }>`
   
   &:active {
     transform: scale(0.95);
+  }
+`;
+
+/**
+ * 右键菜单容器样式
+ */
+const ContextMenu = styled(motion.div)<{ $x: number; $y: number }>`
+  position: fixed;
+  left: ${props => props.$x}px;
+  top: ${props => props.$y}px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px 0 rgba(139, 92, 246, 0.2),
+    0 0 0 1px rgba(139, 92, 246, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+  padding: 6px;
+  min-width: 120px;
+  z-index: 1000;
+`;
+
+/**
+ * 右键菜单项样式
+ */
+const ContextMenuItem = styled.button<{ $danger?: boolean }>`
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: ${props => props.$danger ? '#ef4444' : '#374151'};
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  &:hover {
+    background: ${props => props.$danger 
+      ? 'rgba(239, 68, 68, 0.1)' 
+      : 'rgba(139, 92, 246, 0.1)'
+    };
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+  
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+`;
+
+/**
+ * 确认对话框遮罩层
+ */
+const ConfirmOverlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+`;
+
+/**
+ * 确认对话框样式
+ */
+const ConfirmDialog = styled(motion.div)`
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 20px 60px rgba(139, 92, 246, 0.3),
+    0 0 0 1px rgba(139, 92, 246, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+`;
+
+/**
+ * 确认对话框标题
+ */
+const ConfirmTitle = styled.h3`
+  color: #1f2937;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+`;
+
+/**
+ * 确认对话框内容
+ */
+const ConfirmContent = styled.p`
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+  word-break: break-all;
+`;
+
+/**
+ * 确认对话框按钮容器
+ */
+const ConfirmButtons = styled.div`
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+`;
+
+/**
+ * 确认对话框按钮
+ */
+const ConfirmButton = styled.button<{ $variant?: 'danger' | 'secondary' }>`
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  
+  ${props => props.$variant === 'danger' ? `
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+    }
+  ` : `
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #6366f1;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.7);
+    }
+  `}
+  
+  &:active {
+    transform: translateY(0);
   }
 `;
 
@@ -247,6 +415,7 @@ const copyToClipboard = async (text: string): Promise<boolean> => {
  * 1. 显示所有子邮箱
  * 2. 显示子邮箱地址和创建时间
  * 3. 提供复制按钮复制邮箱地址
+ * 4. 提供右键菜单支持删除操作
  * 
  * @param className - 自定义CSS类名
  * @param onItemClick - 子邮箱项点击回调
@@ -256,7 +425,16 @@ const SubEmailList: React.FC<SubEmailListProps> = ({
   onItemClick
 }) => {
   const { list, loading, error } = useSubEmail();
+  const subEmailContext = useContext(SubEmailContext);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; address: string } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+
+  if (!subEmailContext) {
+    throw new Error('SubEmailList必须在SubEmailProvider内使用');
+  }
+
+  const { deleteSubEmail } = subEmailContext;
 
   /**
    * 处理复制按钮点击
@@ -272,6 +450,68 @@ const SubEmailList: React.FC<SubEmailListProps> = ({
       setTimeout(() => setCopiedId(null), 2000);
     }
   };
+
+  /**
+   * 处理右键菜单
+   * @param event 鼠标事件
+   * @param address 子邮箱地址
+   */
+  const handleContextMenu = (event: React.MouseEvent, address: string) => {
+    event.preventDefault();
+    setContextMenu({
+      x: event.clientX,
+      y: event.clientY,
+      address
+    });
+  };
+
+  /**
+   * 关闭右键菜单
+   */
+  const closeContextMenu = () => {
+    setContextMenu(null);
+  };
+
+  /**
+   * 处理删除操作
+   * @param address 子邮箱地址
+   */
+  const handleDelete = (address: string) => {
+    setConfirmDelete(address);
+    closeContextMenu();
+  };
+
+  /**
+   * 确认删除
+   */
+  const confirmDeleteAction = async () => {
+    if (!confirmDelete) return;
+    
+    try {
+      await deleteSubEmail(confirmDelete);
+      setConfirmDelete(null);
+    } catch (error) {
+      console.error('删除子邮箱失败:', error);
+    }
+  };
+
+  /**
+   * 取消删除
+   */
+  const cancelDelete = () => {
+    setConfirmDelete(null);
+  };
+
+  /**
+   * 点击其他地方关闭右键菜单
+   */
+  React.useEffect(() => {
+    const handleClick = () => closeContextMenu();
+    if (contextMenu) {
+      document.addEventListener('click', handleClick);
+      return () => document.removeEventListener('click', handleClick);
+    }
+  }, [contextMenu]);
 
   // 加载中状态
   if (loading) {
@@ -323,6 +563,7 @@ const SubEmailList: React.FC<SubEmailListProps> = ({
             initial="hidden"
             animate="visible"
             onClick={() => onItemClick?.(subEmail)}
+            onContextMenu={(e) => handleContextMenu(e, subEmail.address)}
           >
             <EmailAddressContainer>
               <EmailAddress>{subEmail.address}</EmailAddress>
@@ -338,6 +579,63 @@ const SubEmailList: React.FC<SubEmailListProps> = ({
           </SubEmailItem>
         ))}
       </ListContainer>
+
+      {/* 右键菜单 */}
+      <AnimatePresence>
+        {contextMenu && (
+          <ContextMenu
+            $x={contextMenu.x}
+            $y={contextMenu.y}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.15 }}
+          >
+            <ContextMenuItem
+              $danger
+              onClick={() => handleDelete(contextMenu.address)}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+              </svg>
+              删除
+            </ContextMenuItem>
+          </ContextMenu>
+        )}
+      </AnimatePresence>
+
+      {/* 删除确认对话框 */}
+      <AnimatePresence>
+        {confirmDelete && (
+          <ConfirmOverlay
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={cancelDelete}
+          >
+            <ConfirmDialog
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ConfirmTitle>确认删除</ConfirmTitle>
+              <ConfirmContent>
+                确定要删除子邮箱 <strong>{confirmDelete}</strong> 吗？此操作无法撤销。
+              </ConfirmContent>
+              <ConfirmButtons>
+                <ConfirmButton $variant="secondary" onClick={cancelDelete}>
+                  取消
+                </ConfirmButton>
+                <ConfirmButton $variant="danger" onClick={confirmDeleteAction}>
+                  删除
+                </ConfirmButton>
+              </ConfirmButtons>
+            </ConfirmDialog>
+          </ConfirmOverlay>
+        )}
+      </AnimatePresence>
     </ListWrapper>
   );
 };

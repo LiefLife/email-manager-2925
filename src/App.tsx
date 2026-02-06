@@ -51,11 +51,13 @@ const TopBar = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.1);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 2px 8px rgba(139, 92, 246, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
   flex-shrink: 0;
 `;
 
@@ -110,12 +112,15 @@ const LeftPanel = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 16px;
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  box-shadow: 0 4px 16px 0 rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px 0 rgba(139, 92, 246, 0.15),
+    0 0 0 1px rgba(139, 92, 246, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
   flex-shrink: 0;
 `;
 
@@ -128,12 +133,15 @@ const MiddlePanel = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 16px;
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  box-shadow: 0 4px 16px 0 rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px 0 rgba(139, 92, 246, 0.15),
+    0 0 0 1px rgba(139, 92, 246, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
 `;
 
 /**
@@ -146,12 +154,15 @@ const RightPanel = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 16px;
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  box-shadow: 0 4px 16px 0 rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px 0 rgba(139, 92, 246, 0.15),
+    0 0 0 1px rgba(139, 92, 246, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
   flex-shrink: 0;
 `;
 
@@ -173,6 +184,33 @@ const LoadingContainer = styled.div`
 const MainApp: React.FC = () => {
   const { isAuthenticated, loading, session, logout } = useAuth();
   const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  /**
+   * 更新实时时间
+   */
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  /**
+   * 格式化时间显示
+   */
+  const formatTime = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  };
 
   /**
    * 处理登出
@@ -233,7 +271,7 @@ const MainApp: React.FC = () => {
       <MainContainer>
         {/* 顶部导航栏 */}
         <TopBar>
-          <AppTitle>2925邮箱管理系统</AppTitle>
+          <AppTitle>{formatTime(currentTime)}</AppTitle>
           <UserInfo>
             <UserEmail>{session?.email}</UserEmail>
             <AnimatedButton
@@ -250,7 +288,7 @@ const MainApp: React.FC = () => {
         <ContentArea>
           {/* 左侧：子邮箱管理面板 */}
           <LeftPanel>
-            <SubEmailManager />
+            <SubEmailManager onOpenSettings={() => setIsSettingsOpen(true)} />
           </LeftPanel>
 
           {/* 中间：邮件列表 */}
@@ -267,6 +305,13 @@ const MainApp: React.FC = () => {
             <EmailDetail email={selectedEmail} />
           </RightPanel>
         </ContentArea>
+
+        {/* 设置弹窗 - 全局覆盖 */}
+        <SubEmailManager 
+          isSettingsMode 
+          isSettingsOpen={isSettingsOpen}
+          onCloseSettings={() => setIsSettingsOpen(false)}
+        />
       </MainContainer>
     </AppContainer>
   );
